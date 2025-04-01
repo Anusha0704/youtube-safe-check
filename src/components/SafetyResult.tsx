@@ -10,7 +10,7 @@ interface SafetyResultProps {
 }
 
 const SafetyResult = ({ result }: SafetyResultProps) => {
-  const { isSafe, categories, transcript } = result;
+  const { isSafe, categories, transcript, title } = result;
 
   const getCategoryCount = () => {
     if (!categories) return 0;
@@ -34,10 +34,10 @@ const SafetyResult = ({ result }: SafetyResultProps) => {
   const getCategoryGroups = () => {
     if (!categories) return [];
     
-    // Group categories by severity
-    const severe = ['hateSpeech', 'violentSpeech', 'riotIncitement', 'sexualContent'];
-    const moderate = ['racialComments', 'cultContent', 'drugReferences'];
-    const mild = ['politicalContent', 'explicitLanguage', 'misinformation'];
+    // Group categories by severity - making sure all your requested categories are properly classified
+    const severe = ['hateSpeech', 'violentSpeech', 'riotIncitement', 'sexualContent', 'cultContent'];
+    const moderate = ['racialComments', 'drugReferences', 'misinformation'];
+    const mild = ['politicalContent', 'explicitLanguage'];
     
     const groups = [
       {
@@ -67,13 +67,22 @@ const SafetyResult = ({ result }: SafetyResultProps) => {
   };
 
   const formatCategoryName = (key: string): string => {
-    return key
+    const categoryDisplayNames: Record<string, string> = {
+      hateSpeech: "Hate Speech",
+      politicalContent: "Political Content",
+      explicitLanguage: "Explicit Language",
+      violentSpeech: "Violent Speech",
+      sexualContent: "Sexual Content",
+      racialComments: "Racial Comments",
+      riotIncitement: "Riot Incitement",
+      cultContent: "Cult Content",
+      misinformation: "Misinformation",
+      drugReferences: "Drug References"
+    };
+    
+    return categoryDisplayNames[key] || key
       .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase())
-      .replace('Speech', ' Speech')
-      .replace('Content', ' Content')
-      .replace('References', ' References')
-      .replace('Incitement', ' Incitement');
+      .replace(/^./, str => str.toUpperCase());
   };
 
   return (
