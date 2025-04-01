@@ -13,6 +13,11 @@ export interface ContentCheckResult {
     explicitLanguage: boolean;
     violentSpeech: boolean;
     sexualContent: boolean;
+    racialComments: boolean;
+    riotIncitement: boolean;
+    cultContent: boolean;
+    misinformation: boolean;
+    drugReferences: boolean;
   };
 }
 
@@ -43,7 +48,12 @@ export const checkYoutubeContent = async (videoId: string): Promise<ContentCheck
       politicalContent: !isSafe ? Math.random() > 0.5 : false,
       explicitLanguage: !isSafe ? Math.random() > 0.3 : false,
       violentSpeech: !isSafe ? Math.random() > 0.8 : false,
-      sexualContent: !isSafe ? Math.random() > 0.6 : false
+      sexualContent: !isSafe ? Math.random() > 0.6 : false,
+      racialComments: !isSafe ? Math.random() > 0.75 : false,
+      riotIncitement: !isSafe ? Math.random() > 0.85 : false,
+      cultContent: !isSafe ? Math.random() > 0.9 : false,
+      misinformation: !isSafe ? Math.random() > 0.65 : false,
+      drugReferences: !isSafe ? Math.random() > 0.7 : false
     };
     
     // Make sure at least one category is true if not safe
@@ -55,8 +65,8 @@ export const checkYoutubeContent = async (videoId: string): Promise<ContentCheck
     
     // Create a realistic-looking transcript
     const transcript = !isSafe 
-      ? "This is a mock transcript that would contain content that would be flagged by the moderation model. In a real implementation, this would be the actual transcript fetched from the YouTube API." 
-      : "This is a mock transcript that is suitable for children. In a real implementation, this would be the actual transcript fetched using the YouTube Transcript API as shown in the Python code.";
+      ? "This is a mock transcript that would contain content that would be flagged by the moderation model. In a real implementation, this would be the actual transcript fetched using the YouTube API and analyzed for various harmful content categories including racial comments, hate speech, political content, incitement to riots, cult references, and other content inappropriate for children." 
+      : "This is a mock transcript that is suitable for children. In a real implementation, this would be the actual transcript fetched using the YouTube Transcript API as shown in the Python code and analyzed by LLaMA 3 for safety.";
     
     return {
       isSafe,

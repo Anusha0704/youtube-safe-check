@@ -3,7 +3,7 @@ import { ContentCheckResult } from "@/services/apiService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, AlertTriangle, Info } from "lucide-react";
 
 interface SafetyResultProps {
   result: ContentCheckResult;
@@ -31,6 +31,51 @@ const SafetyResult = ({ result }: SafetyResultProps) => {
     );
   };
 
+  const getCategoryGroups = () => {
+    if (!categories) return [];
+    
+    // Group categories by severity
+    const severe = ['hateSpeech', 'violentSpeech', 'riotIncitement', 'sexualContent'];
+    const moderate = ['racialComments', 'cultContent', 'drugReferences'];
+    const mild = ['politicalContent', 'explicitLanguage', 'misinformation'];
+    
+    const groups = [
+      {
+        name: 'High Concern',
+        icon: <AlertTriangle className="h-4 w-4" />,
+        items: Object.entries(categories)
+          .filter(([key]) => severe.includes(key))
+          .filter(([, value]) => value)
+      },
+      {
+        name: 'Moderate Concern',
+        icon: <Info className="h-4 w-4" />,
+        items: Object.entries(categories)
+          .filter(([key]) => moderate.includes(key))
+          .filter(([, value]) => value)
+      },
+      {
+        name: 'Mild Concern',
+        icon: <Info className="h-4 w-4" />,
+        items: Object.entries(categories)
+          .filter(([key]) => mild.includes(key))
+          .filter(([, value]) => value)
+      }
+    ].filter(group => group.items.length > 0);
+    
+    return groups;
+  };
+
+  const formatCategoryName = (key: string): string => {
+    return key
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, str => str.toUpperCase())
+      .replace('Speech', ' Speech')
+      .replace('Content', ' Content')
+      .replace('References', ' References')
+      .replace('Incitement', ' Incitement');
+  };
+
   return (
     <Card className={`w-full max-w-2xl border-2 ${getResultClasses()} rounded-xl`}>
       <CardHeader className="pb-2">
@@ -48,28 +93,53 @@ const SafetyResult = ({ result }: SafetyResultProps) => {
         <CardDescription className={isSafe ? "text-green-700 text-base mt-1" : "text-red-700 text-base mt-1"}>
           {isSafe
             ? "This content appears to be safe for children."
-            : "This content may contain potentially sensitive material."}
+            : "This content may contain potentially sensitive material not appropriate for children."}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-2">
         {!isSafe && categories && (
           <div className="mt-4 space-y-3">
             <h3 className="text-sm font-medium">Issues Detected:</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {Object.entries(categories).map(
-                ([key, value]) =>
-                  value && (
-                    <Badge
-                      key={key}
-                      variant="outline"
-                      className="justify-start border-unsafe text-unsafe py-1.5 rounded-full"
-                    >
-                      <XCircle className="h-3.5 w-3.5 mr-1.5" />
-                      {key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
-                    </Badge>
-                  )
-              )}
-            </div>
+            
+            {getCategoryGroups().length > 0 ? (
+              <div className="space-y-4">
+                {getCategoryGroups().map((group, idx) => (
+                  <div key={idx} className="space-y-2">
+                    <h4 className="text-xs font-semibold opacity-75 flex items-center gap-1">
+                      {group.icon} {group.name}
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {group.items.map(([key]) => (
+                        <Badge
+                          key={key}
+                          variant="outline"
+                          className="justify-start border-unsafe text-unsafe py-1.5 rounded-full"
+                        >
+                          <XCircle className="h-3.5 w-3.5 mr-1.5" />
+                          {formatCategoryName(key)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {Object.entries(categories).map(
+                  ([key, value]) =>
+                    value && (
+                      <Badge
+                        key={key}
+                        variant="outline"
+                        className="justify-start border-unsafe text-unsafe py-1.5 rounded-full"
+                      >
+                        <XCircle className="h-3.5 w-3.5 mr-1.5" />
+                        {formatCategoryName(key)}
+                      </Badge>
+                    )
+                )}
+              </div>
+            )}
           </div>
         )}
         
