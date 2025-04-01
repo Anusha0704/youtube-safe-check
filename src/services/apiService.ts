@@ -17,15 +17,25 @@ export interface ContentCheckResult {
 }
 
 // For demo purposes, we'll mock the API responses
-// In a real implementation, this would call a backend service
+// In a real implementation, this would call a Python backend service
 export const checkYoutubeContent = async (videoId: string): Promise<ContentCheckResult> => {
   try {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // This is a mock implementation that randomly determines safety
-    // In a real app, this would call your backend API
-    const isSafe = Math.random() > 0.5;
+    // This is a mock implementation
+    // In a real app, this would make a fetch call to your Python backend API
+    // Example:
+    // const response = await fetch('/api/check-content', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ videoId })
+    // });
+    // const data = await response.json();
+    // return data;
+    
+    // Mock implementation for demo purposes
+    const isSafe = Math.random() > 0.3; // Make 70% of videos "safe" for demo
     
     // Create mock categories with at least one being true if not safe
     const categories = {
@@ -43,10 +53,15 @@ export const checkYoutubeContent = async (videoId: string): Promise<ContentCheck
       categories[keys[randomIndex]] = true;
     }
     
+    // Create a realistic-looking transcript
+    const transcript = !isSafe 
+      ? "This is a mock transcript that would contain content that would be flagged by the moderation model. In a real implementation, this would be the actual transcript fetched from the YouTube API." 
+      : "This is a mock transcript that is suitable for children. In a real implementation, this would be the actual transcript fetched using the YouTube Transcript API as shown in the Python code.";
+    
     return {
       isSafe,
       videoId,
-      transcript: "This is a sample transcript of the video. In a real implementation, this would be the actual transcript fetched from the YouTube API.",
+      transcript,
       title: "Sample YouTube Video",
       categories
     };

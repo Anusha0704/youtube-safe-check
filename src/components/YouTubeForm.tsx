@@ -41,9 +41,9 @@ const YouTubeForm = ({ onSubmit, isLoading }: YouTubeFormProps) => {
   };
 
   return (
-    <Card className="w-full max-w-2xl shadow-lg border-2">
-      <CardContent className="pt-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <Card className="w-full max-w-2xl overflow-hidden shadow-lg border-none">
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label htmlFor="youtube-url" className="text-sm font-medium text-gray-700">
               Enter YouTube URL
@@ -55,9 +55,9 @@ const YouTubeForm = ({ onSubmit, isLoading }: YouTubeFormProps) => {
                 placeholder="https://www.youtube.com/watch?v=..."
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className={`pr-10 ${
-                  error ? "border-red-500 focus-visible:ring-red-500" : ""
-                }`}
+                className={`pr-10 shadow-sm ${
+                  error ? "border-red-500 focus-visible:ring-red-500" : "border-gray-300 focus-visible:ring-youtube/30"
+                } rounded-lg text-base`}
                 disabled={isLoading}
               />
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -71,7 +71,7 @@ const YouTubeForm = ({ onSubmit, isLoading }: YouTubeFormProps) => {
           </div>
           <Button 
             type="submit" 
-            className="w-full bg-youtube hover:bg-red-700 text-white"
+            className="w-full bg-gradient-to-r from-youtube to-red-600 hover:from-red-600 hover:to-youtube text-white shadow-md rounded-lg py-6 text-base font-medium transition-all duration-300 border-none"
             disabled={isLoading}
           >
             {isLoading ? "Checking Content..." : "Check Content Safety"}

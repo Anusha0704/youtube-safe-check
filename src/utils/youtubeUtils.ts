@@ -6,28 +6,63 @@
 export const extractYoutubeId = (url: string): string | null => {
   if (!url) return null;
   
-  // Try to match various YouTube URL patterns
-  const patterns = [
-    // Standard watch URLs
-    /(?:youtube\.com\/watch\?v=|youtube\.com\/watch\?.+&v=)([^&]+)/,
-    // Short youtu.be URLs
-    /youtu\.be\/([^?&]+)/,
-    // YouTube Shorts
-    /youtube\.com\/shorts\/([^?&]+)/,
-    // YouTube Embed
-    /youtube\.com\/embed\/([^?&]+)/,
-    // YouTube v= parameter anywhere in the URL
-    /[?&]v=([^&]+)/
-  ];
-
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match && match[1]) {
-      return match[1];
+  try {
+    const parsedUrl = new URL(url);
+    
+    // youtu.be domain (short links)
+    if (parsedUrl.hostname === 'youtu.be') {
+      return parsedUrl.pathname.substring(1);
     }
-  }
+    
+    // youtube.com domain
+    if (parsedUrl.hostname === 'youtube.com' || parsedUrl.hostname === 'www.youtube.com') {
+      // Normal watch URLs
+      if (parsedUrl.pathname === '/watch') {
+        return parsedUrl.searchParams.get('v');
+      }
+      
+      // Embed URLs
+      if (parsedUrl.pathname.startsWith('/embed/')) {
+        return parsedUrl.pathname.split('/')[2];
+      }
+      
+      // /v/ URLs
+      if (parsedUrl.pathname.startsWith('/v/')) {
+        return parsedUrl.pathname.split('/')[2];
+      }
+      
+      // Shorts URLs
+      if (parsedUrl.pathname.startsWith('/shorts/')) {
+        return parsedUrl.pathname.split('/')[2];
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    // If URL parsing fails, try regex as fallback
+    // Try to match various YouTube URL patterns
+    const patterns = [
+      // Standard watch URLs
+      /(?:youtube\.com\/watch\?v=|youtube\.com\/watch\?.+&v=)([^&]+)/,
+      // Short youtu.be URLs
+      /youtu\.be\/([^?&]+)/,
+      // YouTube Shorts
+      /youtube\.com\/shorts\/([^?&]+)/,
+      // YouTube Embed
+      /youtube\.com\/embed\/([^?&]+)/,
+      // YouTube v= parameter anywhere in the URL
+      /[?&]v=([^&]+)/
+    ];
 
-  return null;
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    return null;
+  }
 };
 
 /**
